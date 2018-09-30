@@ -185,6 +185,18 @@ ifneq ($(CONFIG_EXT4_FS),)
   obj-$(CONFIG_LTTNG) += $(ext4)
 endif # CONFIG_EXT4_FS
 
+ifneq ($(CONFIG_XFS_FS),)
+  xfs_dep = $(srctree)/fs/xfs/*.h $(srctree)/fs/xfs/libxfs/*.h
+  xfs = lttng-probe-xfs.o
+  ifeq ($(wildcard $(xfs_dep)),)
+    $(warning Files $(xfs_dep) not found. Probe "xfs" is disabled. Use full kernel source tree to enable it.)
+    xfs =
+  else
+    CFLAGS_lttng-probe-xfs.o += -I$(srctree)/fs/xfs/libxfs
+  endif # $(wildcard $(xfs_dep))
+  obj-$(CONFIG_LTTNG) += $(xfs)
+endif # CONFIG_XFS_FS
+
 obj-$(CONFIG_LTTNG) +=  $(shell \
   if [ $(VERSION) -ge 4 \
     -o \( $(VERSION) -eq 3 -a $(PATCHLEVEL) -ge 4 \) ] ; then \
